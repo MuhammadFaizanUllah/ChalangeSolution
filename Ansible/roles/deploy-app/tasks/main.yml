@@ -1,5 +1,5 @@
 ---
 
-#- include: fetch-code.yml
+- include: fetch-code.yml
 
 - include: create-docker-image.yml
