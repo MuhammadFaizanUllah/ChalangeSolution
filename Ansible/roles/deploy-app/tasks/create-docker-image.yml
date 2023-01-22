@@ -1,0 +1,48 @@
+---
+
+- name: install make
+  shell: sudo yum install -y gcc-c++ make
+  
+- name: install source
+  shell: curl -sL https://rpm.nodesource.com/setup_14.x | sudo -E bash -
+
+- name: install nodejs
+  shell: sudo yum install -y nodejs
+
+- name: install docker
+  shell: sudo yum install -y docker
+
+- name: start docker daemon
+  shell: sudo systemctl start docker
+
+- name: Download Apache Maven 
+  get_url: url=https://dlcdn.apache.org/maven/maven-3/3.8.7/binaries/apache-maven-3.8.7-bin.tar.gz dest=/tmp/apache-maven-3.8.7-bin.tar.gz
+
+- name: Untar Maven 
+  shell: chdir=/tmp creates=/opt/apache-maven-3.8.7 tar -zxf apache-maven-3.8.7-bin.tar.gz -C /home/ec2-user
+
+- name: Update path for maven use
+  shell: export PATH=/home/ec2-user/apache-maven-3.8.7/bin:$PATH
+
+- name: install java
+  shell: sudo yum install java-1.8.0-openjdk
+
+- name: install node modules for frontend
+  shell: sudo npm install
+  args:
+    chdir: "{{ code_dir }}/validator-frontend"
+
+- name: run npm build
+  shell: sudo npm run build
+  args:
+    chdir: "{{ code_dir }}/validator-frontend"
+
+- name: create docker image for frontend
+  shell: sudo docker build -t validator-frontend-image .
+  args:
+    chdir: "{{ code_dir }}/validator-frontend"
+
+- name: run maven clean install for backend
+  shell: sudo /home/ec2-user/apache-maven-3.8.7/bin/mvn clean install
+  args:
+    chdir: "{{ code_dir }}/validator-backend" 

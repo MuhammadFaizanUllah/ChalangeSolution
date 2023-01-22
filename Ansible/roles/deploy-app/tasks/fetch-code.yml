@@ -1,0 +1,7 @@
+---
+
+- name: Clone a github repository
+  git:
+   repo: git@github.com:Jumia/DevOps-Challenge.git
+   dest: /home/ec2-user/code
+   clone: yes
